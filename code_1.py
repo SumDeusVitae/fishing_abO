@@ -64,7 +64,7 @@ def cork_loc(x, reg):
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
 
-    if(x<(x_len/2)):
+    if(x<(x_len/2 + x_len*0.03)):
         pyautogui.mouseDown()
     else: 
         pyautogui.mouseUp()
