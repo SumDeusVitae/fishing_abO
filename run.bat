@@ -1,2 +1,2 @@
-python code.py
+python our_code.py
 pause
