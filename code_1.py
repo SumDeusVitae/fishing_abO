@@ -4,6 +4,7 @@ import torch
 import time
 import os
 import keyboard
+import random
 
 # Helping functions copied from prev code
 def get_screen(title:str) -> list[object, tuple]:
@@ -18,7 +19,8 @@ def get_screen(title:str) -> list[object, tuple]:
                 print("Couldn't open app")
             time.sleep(0.1)
         active_window_region: tuple = (ao[0].left+7, ao[0].top, ao[0].right-7, ao[0].bottom-7)
-        screenshot: object = ImageGrab.grab(bbox=active_window_region)
+        # print(active_window_region)
+        screenshot: object = ImageGrab.grab(bbox=active_window_region, all_screens=True)
         return screenshot, active_window_region
     else:
         return None, None
@@ -56,7 +58,7 @@ def exiting() -> None:
 def throw(x, y) -> None:
     # pyautogui.moveTo(x)
     pyautogui.mouseDown(x=x, y=y)
-    time.sleep(0.5)
+    time.sleep(random.randint(2, 10)/10)
     pyautogui.mouseUp()
 
 def cork_loc(x, reg):
@@ -64,7 +66,7 @@ def cork_loc(x, reg):
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
 
-    if(x<(x_len/2 + x_len*0.03)):
+    if(x<(x_len/2 + x_len*0.03)): # Half screen + 3 %
         pyautogui.mouseDown()
     else: 
         pyautogui.mouseUp()
@@ -74,21 +76,19 @@ def cork_loc(x, reg):
 def minigame(title: str) -> None:
     detections, reg = detection(title)
     vals = iterate_df(detections) 
-    print(f'Vals before while{vals}')
+    # print(f'Vals before while{vals}')
     while('minigame' in vals or 'cork' in vals):
         if(keyboard.is_pressed('k')):
             print('Exited cycle')
             return
         if('cork' in vals):
-            print(detections)
+            # print(detections)
             for index, row in detections.iterrows():
                 if (row['name'] == 'cork'):
                     x = (row["xmin"]+row["xmax"])/2
                     cork_loc(x, reg)
         detections, reg = detection(title)
-        # print(f'Type detections{type(detections)}')
         if isinstance(detections, list):
-            # print('IT A LIST!!!')
             pyautogui.mouseUp()
             time.sleep(1)
             return                
@@ -110,23 +110,29 @@ def runner(x,y,title) -> None:
     time.sleep(2)
     detections , region = detection(title)
     vals: list = iterate_df(detections)
-    print(detections)
+    
     while('stat' in vals):
         if(keyboard.is_pressed('k')):
             print('Exited cycle')
             return
-        print('detected stat')
+        # print('detected stat')
         # time.sleep(0.2)
-        print(detections)
+        # print(detections)
         if('catch' in vals):
             break
         detections, region  = detection(title)
         vals = iterate_df(detections)      
     if('catch' in vals):
-        pyautogui.click(x, y)
-        time.sleep(0.2)    
-        minigame(title)
-        pyautogui.mouseUp()
+        for index, row in detections.iterrows():
+                if (row['name'] == 'catch'):
+                    if (row['confidence'] > 0.7):
+                        print(f"Confidence = {row['confidence']}")
+                        pyautogui.click(x, y)
+                        time.sleep(0.2)    
+                        minigame(title)
+                        pyautogui.mouseUp()
+                        time.sleep(1)              
+    # time.sleep(0.2)
 
 
 def start() -> None:
@@ -138,17 +144,34 @@ def start() -> None:
             return
         runner(x,y,title)
 
+def mini() -> None:
+    title: str = 'Albion Online Client'
+    pyautogui.mouseDown()
+    time.sleep(0.1)
+    minigame(title)
+    x, y = pyautogui.position()
+    time.sleep(1)
+    throw(x, y)
+
+def hook() -> None:
+    keyboard.add_hotkey('space', mini)
+
+def unhook()->None:
+    keyboard.unhook_key("space")
+
 def buttons_listener():
+    print('Main Listener')
+    keyboard.add_hotkey('ctrl+l', mini)
     keyboard.add_hotkey('ctrl+q', exiting)
     keyboard.add_hotkey('ctrl+space', start)
+    # keyboard.add_hotkey('ctrl+p', unhook)
+    # keyboard.add_hotkey('ctrl+o', hook)
     keyboard.wait()
 
 
 
 def main() -> None:
     buttons_listener()
-
-
 
 
 if __name__ == "__main__":
