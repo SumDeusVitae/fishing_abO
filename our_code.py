@@ -151,21 +151,13 @@ def mini() -> None:
     minigame(title)
     x, y = pyautogui.position()
     time.sleep(1)
-    throw(x, y)
-
-def hook() -> None:
-    keyboard.add_hotkey('space', mini)
-
-def unhook()->None:
-    keyboard.unhook_key("space")
+    # throw(x, y)
 
 def buttons_listener():
     print('Main Listener')
     keyboard.add_hotkey('ctrl+l', mini)
     keyboard.add_hotkey('ctrl+q', exiting)
     keyboard.add_hotkey('ctrl+space', start)
-    # keyboard.add_hotkey('ctrl+p', unhook)
-    # keyboard.add_hotkey('ctrl+o', hook)
     keyboard.wait()
 
 
