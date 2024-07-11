@@ -105,7 +105,7 @@ def cork_loc(x, reg):
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
 
-    if(x<(x_len/2 + x_len*0.1)): # Half screen + 10 %
+    if(x<(x_len/2 + x_len*0.05)): # Half screen + 5 %
         pyautogui.mouseDown()
     else: 
         pyautogui.mouseUp()
@@ -115,26 +115,35 @@ def cork_loc(x, reg):
 def minigame(title: str) -> None:
     detections, reg = detection(title, None, True)
     vals = iterate_df(detections) 
+    could_not: int = 0
     # print(f'Vals before while{vals}')
-    while('minigame' in vals or 'cork' in vals):
-        if(keyboard.is_pressed('k')):
-            print('Exited cycle')
-            return
-        if('cork' in vals):
-            # print(detections)
-            for index, row in detections.iterrows():
-                if (row['name'] == 'cork'):
-                    x = (row["xmin"]+row["xmax"])/2
-                    cork_loc(x, reg)
+    while(could_not < 5):
+        if('minigame' not in vals):
+            if('cork' not in vals):
+                could_not+=1
+                print(f'No minigame or cork, couldnot find = {could_not}')                
+        else:
+        # while('minigame' in vals or 'cork' in vals):
+            if(keyboard.is_pressed('k')):
+                print('Exited cycle')
+                return
+            if('cork' in vals):
+                # print(detections)
+                for index, row in detections.iterrows():
+                    if (row['name'] == 'cork'):
+                        x = (row["xmin"]+row["xmax"])/2
+                        cork_loc(x, reg)
+            detections, reg = detection(title, None, True)
+            if isinstance(detections, list):
+                pyautogui.mouseUp()
+                time.sleep(1)
+                return                
+            # print(f'Detections: /n {detections}')
+            vals = iterate_df(detections)
+            # print(f'Detections: /n {vals}')
+        # print(vals)       
         detections, reg = detection(title, None, True)
-        if isinstance(detections, list):
-            pyautogui.mouseUp()
-            time.sleep(1)
-            return                
-        # print(f'Detections: /n {detections}')
         vals = iterate_df(detections)
-        # print(f'Detections: /n {vals}')
-                
 
 def iterate_df(df) -> list:
     results: list = []
