@@ -6,7 +6,8 @@ import os
 import keyboard
 import random
 
-# Helping functions copied from prev code
+global_down: bool = False
+
 def get_screen(title:str, target:tuple = None, mini: bool = False) -> list[object, tuple]:
     ao: object = pyautogui.getWindowsWithTitle(title) #'Albion Online Client'
     # print(f'active {pyautogui.getActiveWindow()}')
@@ -100,19 +101,24 @@ def exiting() -> None:
 
 def throw(x, y) -> None:
     # pyautogui.moveTo(x)
+    global global_down
     pyautogui.mouseDown(x=x, y=y)
+    global_down = True
     time.sleep(random.randint(2, 10)/10)
     pyautogui.mouseUp()
+    global_down = False
 
 def cork_loc(x, reg):
     x_len = reg[2]-reg[0]
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
-
+    global global_down
     if(x<(x_len/2 + x_len*0.07)): # Half screen + 7 %
         pyautogui.mouseDown()
+        global_down = True
     else: 
         pyautogui.mouseUp()
+        global_down = False
     
 
 
@@ -120,6 +126,7 @@ def minigame(title: str) -> None:
     detections, reg = detection(title, None, True)
     vals = iterate_df(detections) 
     could_not: int = 0
+    global global_down
     # print(f'Vals before while{vals}')
     while(could_not < 5):
         if('minigame' not in vals):
@@ -140,6 +147,7 @@ def minigame(title: str) -> None:
             detections, reg = detection(title, None, True)
             if isinstance(detections, list):
                 pyautogui.mouseUp()
+                global_down = False
                 time.sleep(1)
                 return                
             # print(f'Detections: /n {detections}')
@@ -159,6 +167,7 @@ def iterate_df(df) -> list:
 
 def runner(x,y,title) -> None:
     # print(f"Target:{x,y}")
+    global global_down
     target: tuple = (x,y)
     throw(x, y)
     time.sleep(2)
@@ -183,10 +192,16 @@ def runner(x,y,title) -> None:
                     if (row['confidence'] > 0.7):
                         print(f"Confidence = {row['confidence']}")
                         pyautogui.click(x, y)
-                        time.sleep(0.2)    
+                        # if (pyautogui.position() != x,y):
+                        #     pyautogui.moveTo(x,y)
+                        # pyautogui.mouseDown()
+                        # global_down = True
+                        # time.sleep(0.2)    
                         minigame(title)
+                        print(f'Exited minigame. Mouse down: {global_down}')
                         pyautogui.mouseUp()
-                        time.sleep(1)              
+                        global_down = False
+                        time.sleep(0.5)              
     # time.sleep(0.2)
 
 
@@ -201,7 +216,9 @@ def start() -> None:
 
 def mini() -> None:
     title: str = 'Albion Online Client'
+    global global_down
     pyautogui.mouseDown()
+    global_down = True
     time.sleep(0.1)
     minigame(title)
     x, y = pyautogui.position()
