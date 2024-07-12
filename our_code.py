@@ -198,7 +198,7 @@ def runner(x,y,title) -> None:
                         # global_down = True
                         # time.sleep(0.2)    
                         minigame(title)
-                        print(f'Exited minigame. Mouse down: {global_down}')
+                        # print(f'Exited minigame. Mouse down: {global_down}')
                         pyautogui.mouseUp()
                         global_down = False
                         time.sleep(0.5)              
