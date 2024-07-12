@@ -42,7 +42,11 @@ def minibox(active_region: tuple) -> tuple:
     mid_x: int = int((active_region[0]+active_region[2]) / 2)
     mid_yy: int = int((active_region[1]+active_region[3]) / 2)
     mid_y: int = int(mid_yy-(mid_yy*0.038)) # Adjusting mid_Y by 3.8%
-    return mid_x - int(mid_x * 0.2),mid_y - int(mid_y * 0.3), mid_x + int(mid_x * 0.2), mid_y + int(mid_y * 0.3)
+    # Width and height of active window
+    width: int = int(active_region[2] - active_region[0])
+    height: int = int(active_region[3] - active_region[1])
+    # 0.1 = 10% and 0.2 = 20% for height and width detection box in minigame, might need to adjust for dif resolution of game screen
+    return mid_x - int(width * 0.1),mid_y - int(height * 0.2), mid_x + int(width * 0.1), mid_y + int(height * 0.2)
 
 def find_quarter(active_region: tuple, target: tuple) -> tuple:
     mid_x: int = int((active_region[0]+active_region[2]) / 2)
@@ -105,7 +109,7 @@ def cork_loc(x, reg):
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
 
-    if(x<(x_len/2 + x_len*0.05)): # Half screen + 5 %
+    if(x<(x_len/2 + x_len*0.07)): # Half screen + 7 %
         pyautogui.mouseDown()
     else: 
         pyautogui.mouseUp()
