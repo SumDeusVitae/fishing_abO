@@ -47,7 +47,7 @@ def minibox(active_region: tuple) -> tuple:
     width: int = int(active_region[2] - active_region[0])
     height: int = int(active_region[3] - active_region[1])
     # 0.1 = 10% and 0.2 = 20% for height and width detection box in minigame, might need to adjust for dif resolution of game screen
-    return mid_x - int(width * 0.1),mid_y - int(height * 0.2), mid_x + int(width * 0.1), mid_y + int(height * 0.2)
+    return mid_x - int(width * 0.2),mid_y - int(height * 0.3), mid_x + int(width * 0.2), mid_y + int(height * 0.3)
 
 def find_quarter(active_region: tuple, target: tuple) -> tuple:
     mid_x: int = int((active_region[0]+active_region[2]) / 2)
@@ -109,11 +109,13 @@ def throw(x, y) -> None:
     global_down = False
 
 def cork_loc(x, reg):
-    x_len = reg[2]-reg[0]
+    detect_box_width = reg[2]-reg[0]
     # print(f'xlen = {x_len}')
     # print(f'x_сork = {x}')
     global global_down
-    if(x<(x_len/2 + x_len*0.07)): # Half screen + 7 %
+    # 70 % of detection box, since we adjusted detection box for mini game we getting back x relevant that detection box
+    if(int(x)<(detect_box_width*0.6)): 
+        print(f'cork location {x} and width of detection box {detect_box_width}')
         pyautogui.mouseDown()
         global_down = True
     else: 
