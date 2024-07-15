@@ -114,7 +114,7 @@ def cork_loc(x, reg):
     # print(f'x_сork = {x}')
     global global_down
     # 70 % of detection box, since we adjusted detection box for mini game we getting back x relevant that detection box
-    if(int(x)<(detect_box_width*0.6)): 
+    if(int(x)<(detect_box_width*0.57)): 
         print(f'cork location {x} and width of detection box {detect_box_width}')
         pyautogui.mouseDown()
         global_down = True
