@@ -114,13 +114,19 @@ def cork_loc(x, reg):
     # print(f'x_сork = {x}')
     global global_down
     # 70 % of detection box, since we adjusted detection box for mini game we getting back x relevant that detection box
-    if(int(x)<(detect_box_width*0.57)): 
-        print(f'cork location {x} and width of detection box {detect_box_width}')
+    # pyautogui.mouseDown() # Test1 Start
+    if (int(x)>(detect_box_width*0.7)): 
+        pyautogui.mouseUp() 
+    else:
         pyautogui.mouseDown()
-        global_down = True
-    else: 
-        pyautogui.mouseUp()
-        global_down = False
+    # Test1 End
+    # if(int(x)<(detect_box_width*0.57)): 
+    #     print(f'cork location {x} and width of detection box {detect_box_width}')
+    #     pyautogui.mouseDown()
+    #     global_down = True
+    # else: 
+    #     pyautogui.mouseUp()
+    #     global_down = False
     
 
 
@@ -145,6 +151,7 @@ def minigame(title: str) -> None:
                 for index, row in detections.iterrows():
                     if (row['name'] == 'cork'):
                         x = (row["xmin"]+row["xmax"])/2
+                        pyautogui.mouseDown #Test1
                         cork_loc(x, reg)
             detections, reg = detection(title, None, True)
             if isinstance(detections, list):
