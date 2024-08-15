@@ -38,7 +38,7 @@ def minibox(active_region: tuple) -> tuple:
     width: int = int(active_region[2] - active_region[0])
     height: int = int(active_region[3] - active_region[1])
     # 0.2 = 20% and 0.3 = 30% for height and width detection box in minigame, might need to adjust for dif resolution of game screen
-    return mid_x - int(width * 0.2),mid_y - int(height * 0.3), mid_x + int(width * 0.2), mid_y + int(height * 0.3)
+    return mid_x - int(width * 0.5),mid_y - int(height * 0.5), mid_x + int(width * 0.5), mid_y + int(height * 0.5)
 
 def find_quarter(active_region: tuple, target: tuple) -> tuple:
     mid_x: int = int((active_region[0]+active_region[2]) / 2)
@@ -68,7 +68,6 @@ def create_model(model_file_path) -> object:
 
 def detection(title: str, target: tuple = None, mini: bool = False) -> list[object, tuple]:
     screenshot, region = get_screen(title, target, mini)
-    # print(screenshot)
     if (screenshot == None):
         return [], None
     result_model = model(screenshot)
@@ -97,7 +96,7 @@ def throw(x, y) -> None:
 def cork_loc(x, reg):
     detect_box_width = reg[2]-reg[0]
     # 55 % of detection box, since we adjusted detection box for mini game we getting back Avg(x) relevant that detection box
-    if (int(x)>(detect_box_width*0.55)): 
+    if (int(x)>(detect_box_width/2)): 
         pyautogui.mouseUp() 
     else:
         pyautogui.mouseDown()
@@ -145,6 +144,7 @@ def iterate_df(df) -> list:
 def runner(x,y,title) -> None:
     target: tuple = (x,y)
     throw(x, y)
+    # Sleep time before throw again
     time.sleep(2)
     detections , region = detection(title, target)
     vals: list = iterate_df(detections)
