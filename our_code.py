@@ -5,6 +5,7 @@ import time
 import os
 import keyboard
 import random
+import pandas as pd
 
 
 def get_screen(title:str, target:tuple = None, mini: bool = False) -> list[object, tuple]:
@@ -106,33 +107,38 @@ def cork_loc(x, reg):
 
 def minigame(title: str) -> None:
     detections, reg = detection(title, None, True)
-    vals = iterate_df(detections) 
-    could_not: int = 0
-    pyautogui.mouseDown()
-    while(could_not < 5):
-        if('minigame' not in vals):
-            if('cork' not in vals):
-                could_not+=1
-                print(f'No minigame or cork, couldnot find = {could_not}')                
-        else:
-            if(keyboard.is_pressed('k')):
-                print('Exited cycle')
-                return
+    if isinstance(detections, pd.DataFrame):
+        # vals = iterate_df(detections) 
+        could_not: int = 0
+        pyautogui.mouseDown()
+        while(could_not < 5):
+                
+            # if('minigame' not in vals):
+            #     if('cork' not in vals):
+            #         could_not+=1
+            #         print(f'No minigame or cork, couldnot find = {could_not}')                
+            # else:
+                if(keyboard.is_pressed('k')):
+                    print('Exited cycle')
+                    return
 
-            # if 'cork' in detections['name'].values:
-            x = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
-            if not x.empty:
-                x = (x['xmin'][0]+x['xmax'][0])/2
-                cork_loc(x, reg)
-                pyautogui.mouseDown()
-            detections, reg = detection(title, None, True)
-            if isinstance(detections, list):
-                pyautogui.mouseUp()
-                time.sleep(1)
-                return                
-            vals = iterate_df(detections)      
+                # if 'cork' in detections['name'].values:
+                x_df = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
+                if x_df.empty:
+                    could_not+=1
+                    print(f'No minigame or cork, couldnot find = {could_not}')
+                else:
+                    x = (x_df['xmin'][0]+x_df['xmax'][0])/2
+                    cork_loc(x, reg)
+                    pyautogui.mouseDown()
+                detections, reg = detection(title, None, True)
+                if isinstance(detections, list):
+                    pyautogui.mouseUp()
+                    time.sleep(1)
+                    return                
+                # vals = iterate_df(detections)      
         detections, reg = detection(title, None, True)
-        vals = iterate_df(detections)
+        # vals = iterate_df(detections)
 
 def iterate_df(df) -> list:
     results: list = []
