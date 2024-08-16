@@ -111,6 +111,7 @@ def minigame(title: str) -> None:
         # vals = iterate_df(detections) 
         could_not: int = 0
         pyautogui.mouseDown()
+        time.sleep(0.1)
         while(could_not < 5):
                 
             # if('minigame' not in vals):
@@ -123,11 +124,15 @@ def minigame(title: str) -> None:
                     return
 
                 # if 'cork' in detections['name'].values:
+                print(f'Before loc detections {detections}')
                 x_df = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
+                print(f'After loc x_df {x_df}')
+ 
                 if x_df.empty:
                     could_not+=1
                     print(f'No minigame or cork, couldnot find = {could_not}')
                 else:
+                    x_df = x_df.reset_index(drop=True)
                     x = (x_df['xmin'][0]+x_df['xmax'][0])/2
                     cork_loc(x, reg)
                     pyautogui.mouseDown()
