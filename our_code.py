@@ -108,26 +108,14 @@ def cork_loc(x, reg):
 def minigame(title: str) -> None:
     detections, reg = detection(title, None, True)
     if isinstance(detections, pd.DataFrame):
-        # vals = iterate_df(detections) 
         could_not: int = 0
         pyautogui.mouseDown()
-        time.sleep(0.1)
+        time.sleep(0.2)
         while(could_not < 5):
-                
-            # if('minigame' not in vals):
-            #     if('cork' not in vals):
-            #         could_not+=1
-            #         print(f'No minigame or cork, couldnot find = {could_not}')                
-            # else:
                 if(keyboard.is_pressed('k')):
                     print('Exited cycle')
                     return
-
-                # if 'cork' in detections['name'].values:
-                print(f'Before loc detections {detections}')
                 x_df = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
-                print(f'After loc x_df {x_df}')
- 
                 if x_df.empty:
                     could_not+=1
                     print(f'No minigame or cork, couldnot find = {could_not}')
@@ -140,17 +128,9 @@ def minigame(title: str) -> None:
                 if isinstance(detections, list):
                     pyautogui.mouseUp()
                     time.sleep(1)
-                    return                
-                # vals = iterate_df(detections)      
+                    return                   
         detections, reg = detection(title, None, True)
-        # vals = iterate_df(detections)
 
-def iterate_df(df) -> list:
-    results: list = []
-    if(type(df) is not list):
-        for index, row in df.iterrows():
-            results.append(row['name'])
-    return results
 
 
 def runner(x,y,title) -> None:
@@ -159,25 +139,26 @@ def runner(x,y,title) -> None:
     # Sleep time before throw again
     time.sleep(2)
     detections , region = detection(title, target)
-    vals: list = iterate_df(detections)
-    
-    while('stat' in vals):
-        if(keyboard.is_pressed('k')):
-            print('Exited cycle')
-            return
-        if('catch' in vals):
-            break
-        detections, region  = detection(title, target)
-        vals = iterate_df(detections)      
-    if('catch' in vals):
-        for index, row in detections.iterrows():
-                if (row['name'] == 'catch'):
-                    if (row['confidence'] > 0.7):
-                        print(f"Confidence = {row['confidence']}")
-                        pyautogui.click(x, y) 
-                        minigame(title)
-                        pyautogui.mouseUp()
-                        time.sleep(0.5)              
+
+    if isinstance(detections, pd.DataFrame):
+        stat_df = detections.loc[detections['name'] == 'stat']
+        while(not stat_df.empty):
+            if(keyboard.is_pressed('k')):
+                print('Exited cycle')
+                return
+            catch_df = detections.loc[detections['name'] == 'catch']
+            if(not catch_df.empty):
+                catch_df = catch_df.reset_index(drop=True)
+                print(f"Confidence: {catch_df['confidence'][0]}")
+                pyautogui.click(x, y) 
+                minigame(title)
+                pyautogui.mouseUp()
+                time.sleep(0.5) 
+                break
+            detections, region  = detection(title, target)
+            if not isinstance(detections, pd.DataFrame):
+                break
+                     
 
 
 def start() -> None:
@@ -215,3 +196,4 @@ if __name__ == "__main__":
     path: str = fr'trained\latest_4_20.pt'
     model: object = create_model(path)
     main()
+
