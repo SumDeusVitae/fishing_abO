@@ -111,25 +111,28 @@ def minigame(title: str) -> None:
         could_not: int = 0
         pyautogui.mouseDown()
         time.sleep(0.2)
+        miss_flag = False
         while(could_not < 5):
                 if(keyboard.is_pressed('k')):
                     print('Exited cycle')
                     return
-                x_df = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
+                if miss_flag:
+                    x_df = x_df.iloc[0:0]
+                else:
+                    x_df = detections.loc[detections['name'] == 'cork', ['xmin', 'xmax']]
                 if x_df.empty:
                     could_not+=1
-                    print(f'No minigame or cork, couldnot find = {could_not}')
+                    print(f'Did not detect minigame cork for {could_not} time(s) out of 5')
                 else:
                     x_df = x_df.reset_index(drop=True)
                     x = (x_df['xmin'][0]+x_df['xmax'][0])/2
                     cork_loc(x, reg)
                     pyautogui.mouseDown()
                 detections, reg = detection(title, None, True)
+                miss_flag = False 
                 if isinstance(detections, list):
-                    pyautogui.mouseUp()
-                    time.sleep(1)
-                    return                   
-        detections, reg = detection(title, None, True)
+                    miss_flag = True               
+        pyautogui.mouseUp()
 
 
 
