@@ -93,6 +93,7 @@ def throw(x, y) -> None:
     pyautogui.mouseDown(x=x, y=y)
     time.sleep(random.randint(2, 10)/10)
     pyautogui.mouseUp()
+    time.sleep(2)
 
 def cork_loc(x, reg):
     detect_box_width = reg[2]-reg[0]
@@ -133,6 +134,7 @@ def minigame(title: str) -> None:
                 if isinstance(detections, list):
                     miss_flag = True               
         pyautogui.mouseUp()
+        time.sleep(3)
 
 
 
@@ -140,7 +142,7 @@ def runner(x,y,title) -> None:
     target: tuple = (x,y)
     throw(x, y)
     # Sleep time before throw again
-    time.sleep(2)
+    # time.sleep(2)
     detections , region = detection(title, target)
 
     if isinstance(detections, pd.DataFrame):
