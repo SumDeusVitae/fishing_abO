@@ -93,7 +93,7 @@ def throw(x, y) -> None:
     pyautogui.mouseDown(x=x, y=y)
     time.sleep(random.randint(2, 10)/10)
     pyautogui.mouseUp()
-    time.sleep(2)
+    time.sleep(1)
 
 def cork_loc(x, reg):
     detect_box_width = reg[2]-reg[0]
